@@ -1,0 +1,48 @@
+syntax = "proto3";
+package stocktrading;
+option java_multiple_files = true;
+option java_package = "com.demo.stocktrading";
+option java_outer_classname = "StockTradingProto";
+
+message StockRequest{
+  string stock_symbol = 1;
+}
+message StockResponse{
+  string stock_symbol = 1;
+  double price = 2;
+  string timestamp = 3;
+}
+service StockTradingService{
+  //UNARY RPC fetch current stock price
+  rpc getStockPrice(StockRequest) returns (StockResponse);
+
+  //server streaming
+  rpc subscribeStockPrice(StockRequest) returns (stream StockResponse);
+
+  //client streaming - place multiple stock orders
+  rpc bulkStockOrder(stream StockOrder) returns (OrderSummary);
+
+  //bidirectional streaming live trading
+  rpc liveTrading(stream StockOrder) returns(stream TradeStatus);
+}
+
+message StockOrder{
+  string order_id =1;
+  string stock_symbol=2;
+  int32 quantity=3;
+  double price=4;
+  string order_type=5;//buy or sell
+}
+
+message OrderSummary{
+  int32 total_orders=1;
+  double total_amount=2;
+  int32 success_count=3;
+}
+
+message TradeStatus{
+  string order_id=1;
+  string status=2;
+  string message=3;
+  string timestamp=4;
+}
